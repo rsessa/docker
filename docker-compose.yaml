@@ -34,9 +34,19 @@ services:
       network: stack
     restart: always
     networks:
-      - stack
-    ports:
-      - 3000:3000
+      - web
+      - interna
+    labels:
+      # Traefik
+      traefik.enable: 'true'
+      traefik.frontend.rule: "Host:${BLACKSTONE_HOST}"
+      traefik.port: '3000'
+      # Caddy
+      caddy: ${BLACKSTONE_HOST}
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+    expose:
+      - 80
+      - 443
     env_file: .env
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DATABASE_HOST}/${POSTGRES_DB}
@@ -48,9 +58,19 @@ services:
     image: calendso/calendso:latest
     restart: always
     networks:
-      - stack
-    ports:
-      - 5555:5555
+      - web
+      - interna
+    labels:
+      # Traefik
+      traefik.enable: 'true'
+      traefik.frontend.rule: "Host:${BLACKSTONE_HOST}"
+      traefik.port: '5555'
+      # Caddy
+      caddy: ${BLACKSTONE_HOST}
+      caddy.reverse_proxy: "{{upstreams 5555}}"
+    expose:
+      - 80
+      - 443
     env_file: .env
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DATABASE_HOST}/${POSTGRES_DB}
